@@ -1,11 +1,14 @@
 package com.example.movingpictures
 
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 
@@ -28,12 +31,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val imageViewUriList: MutableList<Uri> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initAddPhotobutton()
         initStartPhotoButton()
+    }
+
+    private fun _showToast(message: String = "기본") {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun initAddPhotobutton() {
@@ -71,6 +80,36 @@ class MainActivity : AppCompatActivity() {
         // 이미지만 필터링하기 위함
         intent.type = "image/*"
         startActivityForResult(intent, 2000)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        resultCode != Activity.RESULT_OK && return
+
+        try {
+            when (requestCode) {
+                2000 -> {
+                    val selectedUri: Uri? = data?.data
+                    if (selectedUri != null && imageViewUriList.size < 6) {
+                        _showToast("" + imageViewUriList.size + " 번")
+                        imageViewUriList.add(selectedUri);
+                        imageViewList[imageViewUriList.size - 1].setImageURI(selectedUri);
+                    } else if (imageViewUriList.size > 5) {
+                        _showToast("6개 꽉참")
+                        return
+                    } else {
+                        _showToast("사진 못가져옴")
+                        return
+                    }
+                }
+                else -> {
+                    _showToast("사진 못가져옴")
+                }
+            }
+        } catch (e: Exception) {
+            _showToast(e.message.toString());
+        }
+
     }
 
     override fun onRequestPermissionsResult(
