@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val imageViewUriList: MutableList<Uri> = mutableListOf()
+    private val imageUriList: MutableList<Uri> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +72,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initStartPhotoButton() {
-
+        buttonStart.setOnClickListener {
+            val intent = Intent(this, PhotoFrameActivity::class.java)
+            imageUriList.forEachIndexed { index, uri ->
+                println("IIIIIIIIIIIIII $index : $uri")
+                intent.putExtra("photo$index", uri.toString())
+            }
+            intent.putExtra("photoListSize", imageUriList.size);
+            startActivity(intent);
+        }
     }
 
     private fun naviagtePhoto() {
@@ -90,11 +98,11 @@ class MainActivity : AppCompatActivity() {
             when (requestCode) {
                 2000 -> {
                     val selectedUri: Uri? = data?.data
-                    if (selectedUri != null && imageViewUriList.size < 6) {
-                        _showToast("" + imageViewUriList.size + " 번")
-                        imageViewUriList.add(selectedUri);
-                        imageViewList[imageViewUriList.size - 1].setImageURI(selectedUri);
-                    } else if (imageViewUriList.size > 5) {
+                    if (selectedUri != null && imageUriList.size < 6) {
+                        _showToast("" + imageUriList.size + " 번")
+                        imageUriList.add(selectedUri);
+                        imageViewList[imageUriList.size - 1].setImageURI(selectedUri);
+                    } else if (imageUriList.size > 5) {
                         _showToast("6개 꽉참")
                         return
                     } else {
